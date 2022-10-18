@@ -39,4 +39,4 @@ longresponse n = do
       H.p ("Welcome to my Scotty app " >> H.toHtml n)
 
 myImage :: H.Html
-myImage = H.img H.! A.src "output.png" H.! A.alt "Hm." 
+myImage = H.img H.! A.src "catpicture.jpg" H.! A.alt "Hm." 
