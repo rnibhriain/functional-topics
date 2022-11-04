@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 
@@ -28,6 +28,9 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Render
+      ShapeMain
+      Shapes
   other-modules:
       Paths_scotty_example
   hs-source-dirs:

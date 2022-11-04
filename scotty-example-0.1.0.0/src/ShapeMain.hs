@@ -1,4 +1,4 @@
-module Main where
+module ShapeMain where
 
 import Shapes
 import Render (render,defaultWindow)
