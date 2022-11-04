@@ -24,6 +24,8 @@ main = scotty 3000 $ do
   get "/cat" $ do
           html $ R.renderHtml
             myImage 
+  get "/image" $ do
+          file "./output.png"
 
 
 response :: Text -> Text
