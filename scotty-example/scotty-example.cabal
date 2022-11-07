@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 86bf03e9cb82819bafbf831be3735cbba7b02a0da864e8487a3a9c34f8ea785d
+-- hash: c008b99e2e26ebf430e0959b0c951793703a803a48431ac6cad2f3e55e30d74e
 
 name:           scotty-example
 version:        0.1.0.0
@@ -37,11 +37,14 @@ library
     , blaze-html
     , scotty
     , text
+    ,JuicyPixels
   default-language: Haskell2010
 
 executable scotty-example-exe
   main-is: Main.hs
   other-modules:
+      Render
+      Shapes
       Paths_scotty_example
   hs-source-dirs:
       app
@@ -52,6 +55,7 @@ executable scotty-example-exe
     , scotty
     , scotty-example
     , text
+    ,JuicyPixels
   default-language: Haskell2010
 
 test-suite scotty-example-test
@@ -68,4 +72,5 @@ test-suite scotty-example-test
     , scotty
     , scotty-example
     , text
+    ,JuicyPixels
   default-language: Haskell2010
