@@ -21,19 +21,21 @@ exampleDrawing1 =  [ (translate (point 0.5 0.25), square, [(255, 0, 0)]) ]
 exampleDrawing2 = [ (identity, mandelbrotset, [(255, 0, 0)])]
 
 -- ellipse
-exampleDrawing3 =  [ (shear 1, square,[(255, 0, 0)]) ]
+exampleDrawing3 =  [ (identity, ellipse,[(255, 0, 0)]) ]
 
 -- rectangle
-exampleDrawing4 = [ (identity, mandelbrotset, [(255, 0, 0)])]
+exampleDrawing4 = [ (identity, rectangle, [(255, 0, 0)])]
 
 -- polygon
 exampleDrawing5 = [ (identity, mandelbrotset, [(255, 0, 0)])]
 
 main :: IO ()
 main = do 
+        render "ellipse.png" defaultWindow exampleDrawing3
         render "mandlebrot.png" defaultWindow exampleDrawing2
         render "square.png" defaultWindow exampleDrawing3
         render "circle.png" defaultWindow exampleDrawing
+        render "rectangle.png" defaultWindow exampleDrawing4
         main2
 
 main2 :: IO () 
@@ -49,12 +51,17 @@ main2 =
   get "/hello/:person" $ do 
       person <- param "person"
       html $ longresponse person
+  get "/ellipse" $ do
+          file "./ellipse.png"
+  get "/rectangle" $ do
+          file "./rectangle.png"
   get "/square" $ do
           file "./square.png"
   get "/mandlebrot" $ do
           file "./mandlebrot.png"
   get "/circle" $ do
           file "./circle.png"
+          --- uhtml "exampleDrawing =  [ (shear 1, circle, [(255, 0, 255)]) ]"
 
 
 response :: Text -> Text

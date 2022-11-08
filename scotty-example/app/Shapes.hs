@@ -57,7 +57,7 @@ empty = Empty
 circle = Circle
 square = Square
 ellipse = Ellipse
-polyon = Polygon
+polygon = Polygon
 rectangle = Rectangle
 mandelbrotset = MandelbrotSet
 
@@ -122,7 +122,7 @@ approxTest n p = all fairlyClose (take n (mandelbrot p))
 {--}
 
 colour :: Point -> Drawing -> Colour
-colour p [(t,s,c)]  = c
+colour _ [(_,_,c)]  = c
 
 inside :: Point -> Drawing -> Bool
 inside p d = or $ map (inside1 p) d
@@ -133,14 +133,21 @@ inside1 p (t,s,_) = insides (transform t p) s
 insides :: Point -> Shape -> Bool
 p `insides` Empty = False
 p `insides` Circle = distance p <= 1
+p `insides` Ellipse = distance1 p <= 1
 p `insides` Square = maxnorm  p <= 1
-p `insides` Rectangle = maxnorm  p <= 1
+p `insides` Rectangle = maxnorm1  p <= 1
 p `insides` MandelbrotSet = approxTest 100 p
 
 distance :: Point -> Double
 distance (Vector x y ) = sqrt ( x**2 + y**2 )
 
+distance1 :: Point -> Double
+distance1 (Vector x y ) = sqrt ( x**2/0.5**2 + y**2/0.3**2 )
+
 maxnorm :: Point -> Double
 maxnorm (Vector x y ) = max (abs x) (abs y)
+
+maxnorm1 :: Point -> Double
+maxnorm1 (Vector x y) = max (abs x / 0.5)  (abs y/ 0.7)
 
 testShape = (scale (point 10 20), circle)
