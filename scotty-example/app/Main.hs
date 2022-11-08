@@ -11,16 +11,19 @@ import Codec.Picture
 import Shapes
 import Render
 
-exampleDrawing =  [ (scale (point 0.5 0.25) <+> translate (point 1.2 0.4), circle) ]
+exampleDrawing =  [ (translate (point 0.5 0.25), circle) ]
+exampleDrawing1 =  [ (translate (point 0.5 0.25), square) ]
 exampleDrawing2 = [ (identity, mandelbrotset)]
 
 main :: IO ()
 main = do 
-        render "output.png" defaultWindow exampleDrawing
+        render "mandlebrot.png" defaultWindow exampleDrawing2
+        render "square.png" defaultWindow exampleDrawing1
+        render "circle.png" defaultWindow exampleDrawing
         main2
 
 main2 :: IO () 
-main2 = --(render "output.png" defaultWindow exampleDrawing2)
+main2 = 
   scotty 3000 $ do
   get "/" $ do
     html "donagh is a big eejit"
@@ -32,8 +35,12 @@ main2 = --(render "output.png" defaultWindow exampleDrawing2)
   get "/hello/:person" $ do 
       person <- param "person"
       html $ longresponse person
-  get "/image" $ do
-          file "./output.png"
+  get "/square" $ do
+          file "./square.png"
+  get "/mandlebrot" $ do
+          file "./mandlebrot.png"
+  get "/circle" $ do
+          file "./circle.png"
 
 
 response :: Text -> Text
