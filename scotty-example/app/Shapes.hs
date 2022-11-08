@@ -1,6 +1,6 @@
 module Shapes(
   Shape, Point, Vector, Transform, Drawing, Colour,
-  point, getX, getY,
+  point, getX, getY, polygon, ellipse,
   empty, circle, square, rectangle, mandelbrotset,
   identity, translate, rotate, colour, scale, shear, (<+>),
   inside)  where
@@ -46,14 +46,18 @@ data Shape = Empty
            | Circle 
            | Square
            | Rectangle
+           | Ellipse
+           | Polygon
            | MandelbrotSet
              deriving Show
 
-empty, circle, square, rectangle :: Shape
+empty, circle, square, ellipse, polygon, rectangle, mandelbrotset :: Shape
 
 empty = Empty
 circle = Circle
 square = Square
+ellipse = Ellipse
+polyon = Polygon
 rectangle = Rectangle
 mandelbrotset = MandelbrotSet
 
