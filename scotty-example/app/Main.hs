@@ -11,14 +11,28 @@ import Codec.Picture
 import Shapes
 import Render
 
-exampleDrawing =  [ (translate (point 0.5 0.25), circle) ]
-exampleDrawing1 =  [ (translate (point 0.5 0.25), square) ]
-exampleDrawing2 = [ (identity, mandelbrotset)]
+-- circle
+exampleDrawing =  [ (shear 1, circle, [(255, 0, 255)]) ]
+
+-- square
+exampleDrawing1 =  [ (translate (point 0.5 0.25), square, [(255, 0, 0)]) ]
+
+-- mandlebrot
+exampleDrawing2 = [ (identity, mandelbrotset, [(255, 0, 0)])]
+
+-- ellipse
+exampleDrawing3 =  [ (shear 1, square,[(255, 0, 0)]) ]
+
+-- rectangle
+exampleDrawing4 = [ (identity, mandelbrotset, [(255, 0, 0)])]
+
+-- polygon
+exampleDrawing5 = [ (identity, mandelbrotset, [(255, 0, 0)])]
 
 main :: IO ()
 main = do 
         render "mandlebrot.png" defaultWindow exampleDrawing2
-        render "square.png" defaultWindow exampleDrawing1
+        render "square.png" defaultWindow exampleDrawing3
         render "circle.png" defaultWindow exampleDrawing
         main2
 

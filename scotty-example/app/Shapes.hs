@@ -1,9 +1,11 @@
 module Shapes(
-  Shape, Point, Vector, Transform, Drawing,
+  Shape, Point, Vector, Transform, Drawing, Colour,
   point, getX, getY,
-  empty, circle, square, mandelbrotset,
-  identity, translate, rotate, scale, (<+>),
+  empty, circle, square, rectangle, mandelbrotset,
+  identity, translate, rotate, colour, scale, shear, (<+>),
   inside)  where
+
+import Codec.Picture
 
 -- Utilities
 
@@ -39,17 +41,20 @@ point :: Double -> Double -> Point
 point = vector
 
 
+
 data Shape = Empty 
            | Circle 
            | Square
+           | Rectangle
            | MandelbrotSet
              deriving Show
 
-empty, circle, square :: Shape
+empty, circle, square, rectangle :: Shape
 
 empty = Empty
 circle = Circle
 square = Square
+rectangle = Rectangle
 mandelbrotset = MandelbrotSet
 
 -- Transformations
@@ -57,6 +62,7 @@ mandelbrotset = MandelbrotSet
 data Transform = Identity
            | Translate Vector
            | Scale Vector
+           | Shear Double
            | Compose Transform Transform
            | Rotate Matrix
              deriving Show
@@ -65,6 +71,7 @@ identity = Identity
 translate = Translate
 scale = Scale
 rotate angle = Rotate $ matrix (cos angle) (-sin angle) (sin angle) (cos angle)
+shear = Shear
 t0 <+> t1 = Compose t0 t1
 
 transform :: Transform -> Point -> Point
@@ -72,11 +79,14 @@ transform Identity                   x = id x
 transform (Translate (Vector tx ty)) (Vector px py)  = Vector (px - tx) (py - ty)
 transform (Scale (Vector tx ty))     (Vector px py)  = Vector (px / tx)  (py / ty)
 transform (Rotate m)                 p = (invert m) `mult` p
+transform (Shear m) (Vector tx ty) = Vector (m*ty + tx)  ty
 transform (Compose t1 t2)            p = transform t2 $ transform t1 p
 
 -- Drawings
 
-type Drawing = [(Transform,Shape)]
+type Drawing = [(Transform,Shape,Colour)]
+
+type Colour = [(Pixel8,Pixel8,Pixel8)]
 
 -- interpretation function for drawings
 
@@ -107,17 +117,20 @@ approxTest n p = all fairlyClose (take n (mandelbrot p))
 
 {--}
 
+colour :: Point -> Drawing -> Colour
+colour p [(t,s,c)]  = c
 
 inside :: Point -> Drawing -> Bool
 inside p d = or $ map (inside1 p) d
 
-inside1 :: Point -> (Transform, Shape) -> Bool
-inside1 p (t,s) = insides (transform t p) s
+inside1 :: Point -> (Transform, Shape, Colour) -> Bool
+inside1 p (t,s,_) = insides (transform t p) s
 
 insides :: Point -> Shape -> Bool
 p `insides` Empty = False
 p `insides` Circle = distance p <= 1
 p `insides` Square = maxnorm  p <= 1
+p `insides` Rectangle = maxnorm  p <= 1
 p `insides` MandelbrotSet = approxTest 100 p
 
 distance :: Point -> Double

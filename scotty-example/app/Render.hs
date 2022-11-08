@@ -48,7 +48,6 @@ mapPoint (Window p0 p1 (w,h)) (x,y) = point scaledX scaledY
     scaledX = scaleValue (0,fromIntegral w) (getX p0, getX p1) (fromIntegral x)
     scaledY = scaleValue (0,fromIntegral h) (getY p0, getY p1) (fromIntegral y)
 
-
 -- Render a drawing into an image, then save into a file
 -- This version relates the Shape language coordinates to the pixel coordinates
 -- using the scaleValue function which is much faster than the original lookup based code.
@@ -56,9 +55,9 @@ render :: String -> Window -> Drawing -> IO ()
 render path win sh = writePng path $ generateImage pixRenderer w h
     where
       Window _ _ (w,h) = win
-      pixRenderer x y = PixelRGB8 c c c where c = (colorForImage $ mapPoint win (x,y))
+      pixRenderer x y = PixelRGB8 r g b where  [(r,g,b)] = (colorForImage $ mapPoint win (x,y))
 
-      colorForImage :: Point -> Pixel8
-      colorForImage p | p `inside` sh = 255
-                      | otherwise     = 0
+      colorForImage :: Point -> Colour
+      colorForImage p | p `inside` sh = p `colour` sh
+                      | otherwise     = [(0,0,0)]
 
