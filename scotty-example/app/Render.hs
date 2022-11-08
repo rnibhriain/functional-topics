@@ -1,4 +1,4 @@
-module Render(Window,defaultWindow,samples,render) where
+module Render where
 import Codec.Picture
 import Shapes
 
