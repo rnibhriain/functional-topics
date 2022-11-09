@@ -18,7 +18,7 @@ mixColours :: Drawing -> Drawing -> Colour
 mixColours [(_,_,c)] [(_,_,c1)] = averageColours c c1
 
 averageColours :: Colour -> Colour -> Colour
-averageColours [(r,g,b)] [(r1,g1,b1)] = [(r+1`div`2,g+g1`div`2,b+b1`div`2)]
+averageColours [(r,g,b)] [(r1,g1,b1)] = [(r+r1`div`2,g+g1`div`2,b+b1`div`2)]
 
 combine :: String -> Window -> Drawing -> Drawing -> IO ()
 combine path win sh th = writePng path $ generateImage pixRenderer w h
