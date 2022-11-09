@@ -15,34 +15,33 @@ import Render
 exampleDrawing =  [ (shear 1, circle, [(255, 0, 255)]) ]
 
 -- square
-exampleDrawing1 =  [ (translate (point 0.5 0.25), square, [(255, 0, 0)]) ]
+exampleDrawing1 =  [ (translate (point0 0.5 0.25), square, [(255, 0, 0)]) ]
 
 -- mandlebrot
-exampleDrawing2 = [ (identity, mandelbrotset, [(255, 0, 0)])]
+exampleDrawing2 = [ (identity0, mandelbrotset, [(255, 0, 255)])]
 
 -- ellipse
-exampleDrawing3 =  [ (identity, ellipse,[(255, 0, 0)]) ]
+exampleDrawing3 =  [ (identity0, ellipse,[(255, 100, 0)]) ]
 
 -- rectangle
-exampleDrawing4 = [ (identity, rectangle, [(255, 0, 0)])]
+exampleDrawing4 = [ (identity0, rectangle, [(255, 0, 50)])]
 
 -- polygon
-exampleDrawing5 = [ (identity, mandelbrotset, [(255, 0, 0)])]
+exampleDrawing5 = [ (shear 1, polygon, [(255, 255, 0)])]
 
 main :: IO ()
 main = do 
-        render "ellipse.png" defaultWindow exampleDrawing3
-        render "mandlebrot.png" defaultWindow exampleDrawing2
-        render "square.png" defaultWindow exampleDrawing3
         render "circle.png" defaultWindow exampleDrawing
+        render "square.png" defaultWindow exampleDrawing1
+        render "mandlebrot.png" defaultWindow exampleDrawing2
+        render "ellipse.png" defaultWindow exampleDrawing3
         render "rectangle.png" defaultWindow exampleDrawing4
-        main2
+        render "polygon.png" defaultWindow exampleDrawing5
+        runServer
 
-main2 :: IO () 
-main2 = 
+runServer :: IO () 
+runServer = 
   scotty 3000 $ do
-  get "/" $ do
-    html "donagh is a big eejit"
   get "/greet/" $ do
       html  "Hello there"
   get "/greet/:name" $ do
@@ -51,17 +50,18 @@ main2 =
   get "/hello/:person" $ do 
       person <- param "person"
       html $ longresponse person
-  get "/ellipse" $ do
-          file "./ellipse.png"
-  get "/rectangle" $ do
-          file "./rectangle.png"
+  get "/circle" $ do
+          file "./circle.png"
   get "/square" $ do
           file "./square.png"
   get "/mandlebrot" $ do
           file "./mandlebrot.png"
-  get "/circle" $ do
-          file "./circle.png"
-          --- uhtml "exampleDrawing =  [ (shear 1, circle, [(255, 0, 255)]) ]"
+  get "/ellipse" $ do
+          file "./ellipse.png"
+  get "/rectangle" $ do
+          file "./rectangle.png"
+  get "/polygon" $ do
+          file "./polygon.png"
 
 
 response :: Text -> Text

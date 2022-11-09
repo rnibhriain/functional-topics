@@ -7,12 +7,12 @@ import Shapes
 --  resolution.
 --  Values are top left & bottom right corner to be rendered, 
 --             and the size of the output device to render into
-data Window = Window Point Point (Int,Int)
+data Window = Window Point0 Point0 (Int,Int)
 
 -- Default window renders a small region around the origin into
 -- a 50x50 pixel image
 defaultWindow :: Window
-defaultWindow = Window (point (-1.5) (-1.5)) (point (1.5) (1.5)) (500,500)
+defaultWindow = Window (point0 (-1.5) (-1.5)) (point0 (1.5) (1.5)) (500,500)
 
 
 -- Generate a list of evenly spaced samples between two values.
@@ -22,9 +22,9 @@ samples :: Double -> Double -> Int -> [Double]
 samples c0 c1 n = take n [ c0, c0 + (c1-c0) / (fromIntegral $ n-1) .. ]
 
 -- Generate the matrix of points corresponding to the pixels of a window.
-pixels :: Window -> [[Point]]
+pixels :: Window -> [[Point0]]
 pixels (Window p0 p1 (w,h)) =
-  [ [ point x y | x <- samples (getX p0) (getX p1) w ]
+  [ [ point0 x y | x <- samples (getX p0) (getX p1) w ]
                 | y <- reverse $ samples (getY p0) (getY p1) h
   ]
 
@@ -42,8 +42,8 @@ scaleValue (a1,a2) (b1,b2) v = b1 + (v - a1) * (b2-b1) / (a2-a1)
 
 -- Convert a screen-space point into an image-space point
 -- in a specific window
-mapPoint :: Window -> (Int,Int) -> Point
-mapPoint (Window p0 p1 (w,h)) (x,y) = point scaledX scaledY
+mapPoint :: Window -> (Int,Int) -> Point0
+mapPoint (Window p0 p1 (w,h)) (x,y) = point0 scaledX scaledY
   where
     scaledX = scaleValue (0,fromIntegral w) (getX p0, getX p1) (fromIntegral x)
     scaledY = scaleValue (0,fromIntegral h) (getY p0, getY p1) (fromIntegral y)
@@ -57,7 +57,7 @@ render path win sh = writePng path $ generateImage pixRenderer w h
       Window _ _ (w,h) = win
       pixRenderer x y = PixelRGB8 r g b where  [(r,g,b)] = (colorForImage $ mapPoint win (x,y))
 
-      colorForImage :: Point -> Colour
+      colorForImage :: Point0 -> Colour
       colorForImage p | p `inside` sh = p `colour` sh
                       | otherwise     = [(0,0,0)]
 
