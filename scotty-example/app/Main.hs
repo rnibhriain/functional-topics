@@ -52,20 +52,28 @@ runServer =
   get "/" $ do
       html  response
   get "/circle" $ do
+         setHeader "Content-Type" "image/png"
          file "./circle.png"
   get "/combining" $ do
+         setHeader "Content-Type" "image/png"
          file "./combining.png"
   get "/square" $ do
+          setHeader "Content-Type" "image/png"
           file "./square.png"
   get "/mandlebrot" $ do
+          setHeader "Content-Type" "image/png"
           file "./mandlebrot.png"
   get "/ellipse" $ do
+          setHeader "Content-Type" "image/png"
           file "./ellipse.png"
   get "/rectangle" $ do
+          setHeader "Content-Type" "image/png"
           file "./rectangle.png"
   get "/polygon" $ do
+          setHeader "Content-Type" "image/png"
           file "./polygon.png"
   get "/masking" $ do
+          setHeader "Content-Type" "image/png"
           file "./masking.png"
 
 
