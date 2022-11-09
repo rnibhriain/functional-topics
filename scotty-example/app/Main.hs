@@ -10,48 +10,50 @@ import qualified Text.Blaze.Html.Renderer.Text as R
 import Codec.Picture
 import Shapes
 import Render
+import qualified Text.Blaze.Html4.FrameSet as F
+import qualified Control.Applicative as H
+import qualified GHC.Read as H
 
 -- circle
-exampleDrawing =  [ (shear 1, circle, [(255, 0, 255)]) ]
+circlePic =  [ (shear 1, circle, [(255, 0, 255)]) ]
+circlePic1 =  [ (identity0, circle, [(0, 100, 255)]) ]
+circlePic2 =  [ (translate (point0 0.5 0), circle, [(255, 0, 255)]) ]
 
 -- square
-exampleDrawing1 =  [ (translate (point0 0.5 0.25), square, [(255, 0, 0)]) ]
+squarePic =  [ (translate (point0 0.5 0.25), square, [(255, 0, 0)]) ]
 
 -- mandlebrot
-exampleDrawing2 = [ (identity0, mandelbrotset, [(255, 0, 255)])]
+mandlebrotPic = [ (identity0, mandelbrotset, [(255, 0, 255)])]
 
 -- ellipse
-exampleDrawing3 =  [ (identity0, ellipse,[(255, 100, 0)]) ]
+ellipsePic =  [ (identity0, ellipse,[(255, 100, 0)]) ]
 
 -- rectangle
-exampleDrawing4 = [ (identity0, rectangle, [(255, 0, 50)])]
+rectanglePic = [ (shear 1, rectangle, [(255, 0, 50)])]
 
 -- polygon
-exampleDrawing5 = [ (shear 1, polygon, [(255, 255, 0)])]
+polygonPic = [ (rotate 7, polygon, [(255, 255, 0)])]
 
 main :: IO ()
 main = do 
-        render "circle.png" defaultWindow exampleDrawing
-        render "square.png" defaultWindow exampleDrawing1
-        render "mandlebrot.png" defaultWindow exampleDrawing2
-        render "ellipse.png" defaultWindow exampleDrawing3
-        render "rectangle.png" defaultWindow exampleDrawing4
-        render "polygon.png" defaultWindow exampleDrawing5
+        renderwith "masking.png" defaultWindow circlePic1 circlePic2
+        render "circle.png" defaultWindow circlePic
+        render "square.png" defaultWindow squarePic
+        render "mandlebrot.png" defaultWindow mandlebrotPic
+        render "ellipse.png" defaultWindow ellipsePic
+        render "rectangle.png" defaultWindow rectanglePic
+        render "polygon.png" defaultWindow polygonPic
         runServer
 
 runServer :: IO () 
 runServer = 
   scotty 3000 $ do
-  get "/greet/" $ do
-      html  "Hello there"
-  get "/greet/:name" $ do
-      name <- param "name"
-      html $ response name
-  get "/hello/:person" $ do 
-      person <- param "person"
-      html $ longresponse person
+  get "/" $ do
+      html  response
   get "/circle" $ do
-          file "./circle.png"
+         file "./circle.png"
+  get "/masking" $ do
+         file "./masking.png"
   get "/square" $ do
           file "./square.png"
   get "/mandlebrot" $ do
@@ -64,17 +66,13 @@ runServer =
           file "./polygon.png"
 
 
-response :: Text -> Text
-response n = do R.renderHtml $ do
-                  H.h1 ( "Hello " >> H.toHtml n)
-
-longresponse :: Text -> Text
-longresponse n = do
-  R.renderHtml $ do
+response :: Text
+response = R.renderHtml $ do
     H.head $ H.title "Welcome page"
     H.body $ do
       H.h1 "Welcome!"
-      H.p ("Welcome to my Scotty app " >> H.toHtml n)
-
-myImage :: H.Html
-myImage = H.img H.! A.src "output.png" H.! A.alt "Hm." 
+      H.h2 "Welcome to my Scotty Image Server "
+      H.hr
+      H.ul  $ do
+         H.li "Circle: [ (shear 1, circle, [(255, 0, 255)]) ]"
+         H.li "[ (shear 1, circle, [(255, 0, 255)]) ]"

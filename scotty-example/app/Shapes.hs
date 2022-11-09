@@ -12,7 +12,7 @@ import Data.Geometry.Polygon.Convex
 import Data.Ext
 
 -- mask :: Drawing -> Drawing -> Drawing
--- [] `mask` [] = 
+-- [] `mask`
 
 
 -- Utilities
@@ -140,7 +140,7 @@ inside1 p (t,s,_) = insides (transform t p) s
 
 insides :: Point0 -> Shape -> Bool
 p `insides` Empty = False
-p `insides` Circle = distance p <= 1
+p `insides` Circle = distance p <= 0.5
 p `insides` Ellipse = distance1 p <= 1
 p `insides` Square = maxnorm  p <= 1
 p `insides` Rectangle = maxnorm1  p <= 1
@@ -150,9 +150,9 @@ p `insides` MandelbrotSet = approxTest 100 p
 simplePoly :: SimplePolygon ( ) Double
 simplePoly = fromPoints $ map ext $
                             [ Point2 0 0
-                            , Point2 0 0.25
+                            , Point2 0 0.5
                             , Point2 0.5 1
-                            , Point2 0.75 0.25
+                            , Point2 0.75 0.5
                             , Point2 0.75 0
                             ]
 

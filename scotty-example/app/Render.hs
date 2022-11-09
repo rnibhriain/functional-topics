@@ -14,6 +14,23 @@ data Window = Window Point0 Point0 (Int,Int)
 defaultWindow :: Window
 defaultWindow = Window (point0 (-1.5) (-1.5)) (point0 (1.5) (1.5)) (500,500)
 
+mixColours :: Drawing -> Drawing -> Colour
+mixColours [(_,_,c)] [(_,_,c1)] = averageColours c c1
+
+averageColours :: Colour -> Colour -> Colour
+averageColours [(r,g,b)] [(r1,g1,b1)] = [(r+1`div`2,g+g1`div`2,b+b1`div`2)]
+
+renderwith :: String -> Window -> Drawing -> Drawing -> IO ()
+renderwith path win sh th = writePng path $ generateImage pixRenderer w h
+    where
+      Window _ _ (w,h) = win
+      pixRenderer x y = PixelRGB8 r g b where  [(r,g,b)] = (colorForImage $ mapPoint win (x,y))
+
+      colorForImage :: Point0 -> Colour
+      colorForImage p | p `inside` sh && p `inside` th  = mixColours sh th
+                      | p `inside` sh = p `colour` sh
+                      | p `inside` th = p `colour` th
+                      | otherwise     = [(0,0,0)]
 
 -- Generate a list of evenly spaced samples between two values.
 -- e.g. samples -1.5 +1.5 25 generates 25 samples evenly spaced
