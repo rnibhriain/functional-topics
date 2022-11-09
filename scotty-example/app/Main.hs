@@ -23,7 +23,7 @@ circlePic2 =  [ (translate (point0 0.5 0), circle, [(255, 0, 255)]) ]
 squarePic =  [ (translate (point0 0.5 0.25), square, [(255, 0, 0)]) ]
 
 -- mandlebrot
-mandlebrotPic = [ (identity0, mandelbrotset, [(255, 0, 255)])]
+mandlebrotPic = [ (rotate 7, mandelbrotset, [(255, 0, 255)])]
 
 -- ellipse
 ellipsePic =  [ (identity0, ellipse,[(255, 100, 0)]) ]
@@ -32,11 +32,12 @@ ellipsePic =  [ (identity0, ellipse,[(255, 100, 0)]) ]
 rectanglePic = [ (shear 1, rectangle, [(255, 0, 50)])]
 
 -- polygon
-polygonPic = [ (rotate 7, polygon, [(255, 255, 0)])]
+polygonPic = [ (scale (point0 1.5 1.5), polygon, [(255, 255, 0)])]
 
 main :: IO ()
 main = do 
-        renderwith "masking.png" defaultWindow circlePic1 circlePic2
+        combine "combining.png" defaultWindow circlePic1 circlePic2
+        mask "masking.png" defaultWindow circlePic1 circlePic2
         render "circle.png" defaultWindow circlePic
         render "square.png" defaultWindow squarePic
         render "mandlebrot.png" defaultWindow mandlebrotPic
@@ -52,8 +53,8 @@ runServer =
       html  response
   get "/circle" $ do
          file "./circle.png"
-  get "/masking" $ do
-         file "./masking.png"
+  get "/combining" $ do
+         file "./combining.png"
   get "/square" $ do
           file "./square.png"
   get "/mandlebrot" $ do
@@ -64,6 +65,8 @@ runServer =
           file "./rectangle.png"
   get "/polygon" $ do
           file "./polygon.png"
+  get "/masking" $ do
+          file "./masking.png"
 
 
 response :: Text
@@ -75,4 +78,10 @@ response = R.renderHtml $ do
       H.hr
       H.ul  $ do
          H.li "Circle: [ (shear 1, circle, [(255, 0, 255)]) ]"
-         H.li "[ (shear 1, circle, [(255, 0, 255)]) ]"
+         H.li "Square: [ (translate (point0 0.5 0.25), square, [(255, 0, 0)]) ]"
+         H.li "Mandlebrot: [ (identity0, mandelbrotset, [(255, 0, 255)])]"
+         H.li "Ellipse: [ (identity0, ellipse,[(255, 100, 0)]) ]"
+         H.li "Rectangle: [ (shear 1, rectangle, [(255, 0, 50)])]"
+         H.li "Polygon: [ (rotate 7, polygon, [(255, 255, 0)])]"
+         H.li "Combining: [ (identity0, circle, [(0, 100, 255)]) ] with [ (translate (point0 0.5 0), circle, [(255, 0, 255)]) ]"
+         H.li "Masking: [ (identity0, circle, [(0, 100, 255)]) ] with [ (translate (point0 0.5 0), circle, [(255, 0, 255)]) ]"

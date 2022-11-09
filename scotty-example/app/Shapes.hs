@@ -11,10 +11,6 @@ import Data.Geometry.Polygon
 import Data.Geometry.Polygon.Convex
 import Data.Ext
 
--- mask :: Drawing -> Drawing -> Drawing
--- [] `mask`
-
-
 -- Utilities
 
 data Vector0 = Vector0 Double Double
@@ -127,8 +123,6 @@ fairlyClose p = (u * u + v * v) < 100
 approxTest :: Int -> Point0 -> Bool
 approxTest n p = all fairlyClose (take n (mandelbrot p))
 
-{--}
-
 colour :: Point0 -> Drawing -> Colour
 colour _ [(_,_,c)]  = c
 
@@ -149,15 +143,15 @@ p `insides` MandelbrotSet = approxTest 100 p
 
 simplePoly :: SimplePolygon ( ) Double
 simplePoly = fromPoints $ map ext $
-                            [ Point2 0 0
-                            , Point2 0 0.5
+                            [ Point2 0.0 0.25
+                            , Point2 0 0.75
+                            , Point2 0.25 1
                             , Point2 0.5 1
-                            , Point2 0.75 0.5
-                            , Point2 0.75 0
+                            , Point2 0.75 0.75
+                            , Point2 0.75 0.25
+                            , Point2 0.5 0
+                            , Point2 0.25 0
                             ]
-
---insidePolygon :: Point -> Double
---insidePolygon (Vector0x y ) = (sqrt ( x**2+ y**2 ))/0.88
 
 distance :: Point0 -> Double
 distance (Vector0 x y ) = sqrt ( x**2 + y**2 )

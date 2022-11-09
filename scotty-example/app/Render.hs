@@ -20,8 +20,8 @@ mixColours [(_,_,c)] [(_,_,c1)] = averageColours c c1
 averageColours :: Colour -> Colour -> Colour
 averageColours [(r,g,b)] [(r1,g1,b1)] = [(r+1`div`2,g+g1`div`2,b+b1`div`2)]
 
-renderwith :: String -> Window -> Drawing -> Drawing -> IO ()
-renderwith path win sh th = writePng path $ generateImage pixRenderer w h
+combine :: String -> Window -> Drawing -> Drawing -> IO ()
+combine path win sh th = writePng path $ generateImage pixRenderer w h
     where
       Window _ _ (w,h) = win
       pixRenderer x y = PixelRGB8 r g b where  [(r,g,b)] = (colorForImage $ mapPoint win (x,y))
@@ -30,6 +30,16 @@ renderwith path win sh th = writePng path $ generateImage pixRenderer w h
       colorForImage p | p `inside` sh && p `inside` th  = mixColours sh th
                       | p `inside` sh = p `colour` sh
                       | p `inside` th = p `colour` th
+                      | otherwise     = [(0,0,0)]
+
+mask :: String -> Window -> Drawing -> Drawing -> IO ()
+mask path win sh th = writePng path $ generateImage pixRenderer w h
+    where
+      Window _ _ (w,h) = win
+      pixRenderer x y = PixelRGB8 r g b where  [(r,g,b)] = (colorForImage $ mapPoint win (x,y))
+
+      colorForImage :: Point0 -> Colour
+      colorForImage p | p `inside` sh && p `inside` th  =p `colour` sh
                       | otherwise     = [(0,0,0)]
 
 -- Generate a list of evenly spaced samples between two values.
