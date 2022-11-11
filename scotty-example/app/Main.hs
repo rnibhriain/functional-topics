@@ -29,7 +29,7 @@ mandlebrotPic = [ (rotate 7, mandelbrotset, [(255, 0, 255)])]
 ellipsePic =  [ (identity0, ellipse,[(255, 100, 0)]) ]
 
 -- rectangle
-rectanglePic = [ (shear 1, rectangle, [(255, 0, 50)])]
+rectanglePic = [ (shear 1 <+> shear 2, rectangle, [(255, 0, 50)])]
 
 -- polygon
 polygonPic = [ (scale (point0 1.5 1.5), polygon, [(255, 255, 0)])]
@@ -64,6 +64,7 @@ runServer =
           setHeader "Content-Type" "image/png"
           file "./mandlebrot.png"
   get "/ellipse" $ do
+          html "hello"
           setHeader "Content-Type" "image/png"
           file "./ellipse.png"
   get "/rectangle" $ do
@@ -87,9 +88,9 @@ response = R.renderHtml $ do
       H.ul  $ do
          H.li "Circle: [ (shear 1, circle, [(255, 0, 255)]) ]"
          H.li "Square: [ (translate (point0 0.5 0.25), square, [(255, 0, 0)]) ]"
-         H.li "Mandlebrot: [ (identity0, mandelbrotset, [(255, 0, 255)])]"
+         H.li "Mandlebrot: [ (rotate 7, mandelbrotset, [(255, 0, 255)])]"
          H.li "Ellipse: [ (identity0, ellipse,[(255, 100, 0)]) ]"
-         H.li "Rectangle: [ (shear 1, rectangle, [(255, 0, 50)])]"
-         H.li "Polygon: [ (rotate 7, polygon, [(255, 255, 0)])]"
+         H.li "Rectangle: [ (shear 1 <+> shear 2, rectangle, [(255, 0, 50)])]"
+         H.li "Polygon: [ (scale (point0 1.5 1.5), polygon, [(255, 255, 0)])]"
          H.li "Combining: [ (identity0, circle, [(0, 100, 255)]) ] with [ (translate (point0 0.5 0), circle, [(255, 0, 255)]) ]"
          H.li "Masking: [ (identity0, circle, [(0, 100, 255)]) ] with [ (translate (point0 0.5 0), circle, [(255, 0, 255)]) ]"

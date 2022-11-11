@@ -14,7 +14,7 @@ import Data.Ext
 -- Utilities
 
 data Vector0 = Vector0 Double Double
-              deriving Show
+              deriving (Eq, Show)
 vector0 = Vector0
 
 cross0 :: Vector0-> Vector0-> Double
@@ -29,7 +29,7 @@ invert (Matrix (Vector0 a b) (Vector0 c d)) = matrix (d / k) (-b / k) (-c / k) (
         
 -- 2x2 square matrices are all we need.
 data Matrix = Matrix Vector0 Vector0
-              deriving Show
+              deriving (Eq, Show)
 
 matrix :: Double -> Double -> Double -> Double -> Matrix
 matrix a b c d = Matrix (Vector0 a b) (Vector0 c d)
@@ -39,8 +39,7 @@ getY (Vector0 x y) = y
 
 -- Shapes
 
-type Point0  = Vector0
-
+type Point0  = Vector0 
 point0 :: Double -> Double -> Point0
 point0 = vector0
 
@@ -73,13 +72,15 @@ data Transform = Identity0
            | Shear Double
            | Compose Transform Transform
            | Rotate Matrix
-             deriving Show
+             deriving (Eq, Show)
 
 identity0 = Identity0
 translate = Translate
 scale = Scale
 rotate angle = Rotate $ matrix (cos angle) (-sin angle) (sin angle) (cos angle)
 shear = Shear
+
+(<+>) :: Transform -> Transform -> Transform
 t0 <+> t1 = Compose t0 t1
 
 transform :: Transform -> Point0 -> Point0
@@ -88,8 +89,14 @@ transform (Translate (Vector0 tx ty)) (Vector0 px py)  = Vector0 (px - tx) (py -
 transform (Scale (Vector0 tx ty))     (Vector0 px py)  = Vector0 (px / tx)  (py / ty)
 transform (Rotate m)                 p = (invert m) `mult` p
 transform (Shear m) (Vector0 tx ty) = Vector0 (m*ty + tx)  ty
-transform (Compose t1 t2)            p = transform t2 $ transform t1 p
+transform (Compose ( Translate (Vector0 tx ty))( Translate (Vector0 tx1 ty1)) ) p = transform (translate (Vector0 (tx + tx1) (ty + ty1))) p
+transform (Compose ( Scale (Vector0 tx ty))( Scale (Vector0 tx1 ty1)) ) p = transform (scale (Vector0 (tx + tx1) (ty + ty1))) p
+transform (Compose ( Shear m)( Shear m1) ) p = transform (shear (m+m1)) p
+transform (Compose ( Rotate m)( Rotate m1) ) p = transform (Rotate (matrixAdd m m1)) p
+transform (Compose t1 t2) p = transform t2 $ transform t1 p
 
+matrixAdd :: Matrix -> Matrix -> Matrix
+matrixAdd (Matrix (Vector0 a b) (Vector0 c d)) (Matrix (Vector0 a1 b1) (Vector0 c1 d1)) = matrix (a +a1) (b+b1) (c+c1) (d+d1)
 -- Drawings
 
 type Drawing = [(Transform,Shape,Colour)]
@@ -163,4 +170,4 @@ maxnorm :: Point0 -> Double
 maxnorm (Vector0 x y ) = max (abs x) (abs y)
 
 maxnorm1 :: Point0 -> Double
-maxnorm1 (Vector0 x y) = max (abs x / 0.5)  (abs y/ 0.7)
+maxnorm1 (Vector0 x y) = max (abs x / 0.7)  (abs y/ 0.2)
