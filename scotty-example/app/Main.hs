@@ -64,7 +64,6 @@ runServer =
           setHeader "Content-Type" "image/png"
           file "./mandlebrot.png"
   get "/ellipse" $ do
-          html "hello"
           setHeader "Content-Type" "image/png"
           file "./ellipse.png"
   get "/rectangle" $ do
