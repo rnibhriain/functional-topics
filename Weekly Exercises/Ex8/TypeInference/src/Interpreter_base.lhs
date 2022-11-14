@@ -16,6 +16,7 @@ I want to get at the standard "print" function using the name System.print
 
 I plan to use these monads to construct the parts of my interpreter
 
+> import Control.Monad
 > import Control.Monad.Identity
 > import Control.Monad.Except
 > import Control.Monad.Reader
@@ -98,6 +99,23 @@ Evaluate an expression
 > eval (Var s) = do env <- ask
 >                   lookup s env
 
+Attempted to create logger 
+
+> data LogEntry = LogEntry { msg::String }
+>  deriving (Eq, Show)
+
+> calc :: Writer [LogEntry] Integer
+> calc = do
+>  output "start"
+>  let x = sum [1..10000000]
+>  output (show x)
+>  output "done"
+>  return x
+
+> output :: String -> Writer [LogEntry] ()
+> output x = tell [LogEntry x]
+
+> test = mapM_ System.print $ execWriter calc
 
 {-------------------------------------------------------------------}
 {- The statement language                                          -}
@@ -113,4 +131,4 @@ Evaluate an expression
 >       deriving (Eq, Show)
 
 
-> main = System.print "inferredtype"
+> main = test
