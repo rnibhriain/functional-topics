@@ -58,7 +58,7 @@ module Game where
     printingReplacements FlagBomb = 'f'
     printingReplacements FlagEmpty = 'e'
     printingReplacements (Neighbours 0) = ' '
-    printingReplacements (Neighbours num) = chr num
+    printingReplacements (Neighbours num) = intToDigit num
 
     printingLostGame:: Cell -> Char
     printingLostGame Bomb = 'x'
