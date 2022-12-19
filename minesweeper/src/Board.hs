@@ -44,7 +44,10 @@ module Board where
     findNeighbours :: Board -> (Int, Int) -> Board
     findNeighbours (Board size cells bombs) (x, y) = 
                 let (head, _:tail) = splitAt ((x*10)+y) cells in
-                            Board size (head ++ [Neighbours 0] ++ tail) bombs
+                            Board size (head ++ [Neighbours (findBombs (Board size cells bombs) (x, y))] ++ tail) bombs
+
+    findBombs :: Board -> (Int, Int) -> Int
+    findBombs _ _ = 0
 
     -- initialises the bomb location list
     initialiseBombs :: Int -> Int -> [Int] -> [Int]

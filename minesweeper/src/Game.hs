@@ -45,14 +45,12 @@ module Game where
     endGame (Board (x, _) grid _) = mapM_ putStrLn (splitEvery x (map printingReplacements grid))
 
     checkForMine :: Board -> Command -> Bool
-    checkForMine (Board _ cells _ ) (Command _ (x, y))  | cells !! ((x*10)+y) == Bomb = True
+    checkForMine (Board _ cells _ ) (Command _ (x, y))  | cells !! ((x*10)+y) == Bomb ||  cells !! ((x*10)+y) == FlagBomb = True
                                             | otherwise = False
 
     -- prints the board
     printBoard :: Board -> IO()
     printBoard (Board (x, _) grid _) = mapM_ putStrLn (splitEvery x (map printingReplacements grid))
-
-
 
     printingReplacements:: Cell -> Char
     printingReplacements Empty = '-'
