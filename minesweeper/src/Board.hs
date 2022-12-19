@@ -41,20 +41,42 @@ module Board where
                     let (head, _:tail) = splitAt x cells in
                             placeBombs (head ++ [Bomb] ++ tail) xs
 
-    findNeighbours :: Board -> (Int, Int) -> Board
-    findNeighbours (Board size cells bombs) (i, j) = 
-                let (head, _:tail) = splitAt ((i*10)+j) cells in
-                            Board size (head ++ [Neighbours (findBombs (Board size cells bombs) (neighbs (i, j)) 0 )] ++ tail) bombs
+    -- returnsLinear coords of neighbours to given tuple coord
+    findNeighbours:: (Int, Int) -> [Int]
+    findNeighbours (i, j) = map (\y -> tupleToLinear (10, 10) y) (filter (\x -> isValidCell (10, 10) x) neighbours)
+        where
+            neighbours = [((i - 1), (j - 1)), ((i - 1), (j)), ((i - 1), (j + 1)),
+                            ((i), (j - 1)), ((i), (j + 1)),
+                            ((i + 1), (j - 1)), ((i + 1), (j)), ((i + 1), (j + 1))]
 
-    neighbs :: (Int, Int) -> [Int]
-    neighbs (i, j) = [(((i - 1)*10) + (j - 1)), (((i - 1)*10 )+ (j)), (((i - 1)*10 )+ (j + 1)), (((i)*10) + (j - 1)), (((i)*10) + (j + 1)), (((i + 1)*10) + (j - 1)), (((i + 1)*10) + (j)), (((i + 1)*10) + (j + 1))]
+    placeNeighbours :: Board -> (Int, Int) -> Board
+    placeNeighbours (Board size cells bombs) (x,y) = 
+                        let (head, _:tail) = splitAt ((x*10)+y) cells in
+                            Board size (head ++ [Neighbours (findNumBombs (Board size cells bombs) (x,y))] ++ tail) bombs
+ 
+    findNumBombs :: Board -> (Int, Int) -> Int
+    findNumBombs board pos = findBombs board (findNeighbours pos) 0
+
+    -- convert tuple coords to index in linear space
+    tupleToLinear:: (Int, Int) -> (Int, Int) -> Int
+    tupleToLinear (width, _) (x, y) = (width * x) + y
+
+    linearToTuple:: Int -> (Int, Int) -> (Int, Int)
+    linearToTuple i (width, _) = ((i `div` width) , (i `mod` width))
+
+    
+    isValidCell :: (Int, Int) -> (Int, Int) -> Bool
+    isValidCell  (row, col) (x, y)    | (x >= 0 && x < row && y >= 0 && y < col) = True
+                                        | otherwise = False
 
     findBombs :: Board -> [Int] -> Int -> Int
-    findBombs (Board _ cells _) (x:[]) input | cells !! x == Bomb = input + 1
+    findBombs (Board _ cells _) (x:[]) input | cells !! x == Bomb || cells !! x == FlagBomb = input + 1
                                            | otherwise = input
-    findBombs (Board size cells bombs) (x:xs) input | cells !! x == Bomb = findBombs (Board size cells bombs) xs (input + 1)
+    findBombs (Board size cells bombs) (x:xs) input | cells !! x == Bomb || cells !! x == FlagBomb = findBombs (Board size cells bombs) xs (input + 1)
                                            | otherwise = findBombs (Board size cells bombs) xs input
     findBombs _ _ _  = 0
+
+
 
     -- initialises the bomb location list
     initialiseBombs :: Int -> Int -> [Int] -> [Int]

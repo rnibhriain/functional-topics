@@ -26,7 +26,7 @@ module Game where
     makeMove :: Command -> Board -> Board
     makeMove (Command 'f' pos) board    | checkForMine board (Command 'f' pos) = flag board pos FlagBomb
                                         | otherwise = flag board pos FlagEmpty
-    makeMove (Command 'r' pos) board = findNeighbours board pos
+    makeMove (Command 'r' pos) board = placeNeighbours board pos
     makeMove _ board = board
 
     isGameFinished :: Command -> Board -> Bool
