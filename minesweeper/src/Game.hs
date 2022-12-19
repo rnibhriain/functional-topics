@@ -21,11 +21,16 @@ module Game where
                 if isGameFinished move board
                     then
                         endGame board
-                    else putStrLn "Move entered\n"
-                    --game (makeMove move board)
+                    else game (makeMove move board)
+
+    makeMove :: Command -> Board -> Board
+    makeMove (Command 'f' pos) board    | checkForMine board (Command 'f' pos) = flag board pos FlagBomb
+                                        | otherwise = flag board pos FlagEmpty
+    makeMove (Command 'r' pos) board = findNeighbours board pos
+    makeMove _ board = board
 
     isGameFinished :: Command -> Board -> Bool
-    isGameFinished (Command 'e' pos) board = checkForMine board (Command 'e' pos) 
+    isGameFinished (Command 'r' pos) board = checkForMine board (Command 'r' pos) 
     isGameFinished (Command _ _) _ = False
 
     convertCommand :: String -> Command
@@ -43,18 +48,20 @@ module Game where
     checkForMine (Board _ cells _ ) (Command _ (x, y))  | cells !! ((x*10)+y) == Bomb = True
                                             | otherwise = False
 
+    -- prints the board
     printBoard :: Board -> IO()
     printBoard (Board (x, _) grid _) = mapM_ putStrLn (splitEvery x (map printingReplacements grid))
+
+
 
     printingReplacements:: Cell -> Char
     printingReplacements Empty = '-'
     printingReplacements Bomb = 'x'
     printingReplacements FlagBomb = 'f'
+    printingReplacements FlagEmpty = 'e'
     printingReplacements (Neighbours 0) = ' '
     printingReplacements (Neighbours num) = chr num
 
     printingLostGame:: Cell -> Char
-    printingLostGame Empty = '-'
     printingLostGame Bomb = 'x'
-    printingLostGame FlagBomb = '-'
-    printingLostGame (Neighbours num) = '-'
+    printingLostGame _ = '-'

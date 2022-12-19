@@ -22,8 +22,8 @@ module Board where
     initialiseBoard (x, y) numBombs = Board dims cells bombs
                         where 
                             dims = (x, y)
-                            cells1 = initBoard ((x*10)+y) [] 
-                            bombs = initialiseBombs ((x*10)+y) numBombs []
+                            cells1 = initBoard (x*y) [] 
+                            bombs = initialiseBombs (x*y) numBombs []
                             cells = placeBombs cells1 bombs
 
 
@@ -41,12 +41,10 @@ module Board where
                     let (head, _:tail) = splitAt x cells in
                             placeBombs (head ++ [Bomb] ++ tail) xs
 
-    --findNeighbours :: Board -> (Int, Int) -> Int
-    --findNeighbours 
-
-    --initialiseBombs :: Int -> Int -> [Int] -> [Int]
-    --initialiseBombs _ 0 bombs = bombs
-    --initialiseBombs size numBombs bombs = initialiseBombs size numbBombs-1 (initBombs bombs 0)
+    findNeighbours :: Board -> (Int, Int) -> Board
+    findNeighbours (Board size cells bombs) (x, y) = 
+                let (head, _:tail) = splitAt ((x*10)+y) cells in
+                            Board size (head ++ [Neighbours 0] ++ tail) bombs
 
     -- initialises the bomb location list
     initialiseBombs :: Int -> Int -> [Int] -> [Int]
@@ -57,10 +55,6 @@ module Board where
                     numBombs = length bombsSoFar
                     g        = mkStdGen numBombs
                     newBombs =  take n (randomRs (0, size-1) g)
-
-    --initBombs :: [Int] -> Int -> [Int]
-    --initBombs bombs location = bombs ++ location
-
 
     flag :: Board -> (Int, Int) -> Cell -> Board
     flag (Board size cells bombs) (x, y) newcell  = 
