@@ -6,12 +6,12 @@ import Reactive.Threepenny
 
 canvasSize = 400
 
-data Modes = Fill | NoFill deriving Show
+data Modes = Beginner | Intermediate deriving Show
 
 
-main :: IO ()
-main = do
-  startGUI defaultConfig setup
+--main :: IO ()
+--main = do
+--  startGUI defaultConfig setup
 
 setup :: Window -> UI ()
 setup window = do
@@ -22,26 +22,26 @@ setup window = do
     # set UI.width canvasSize
     # set UI.style [("border", "solid black 1px"), ("background", "#eee")]
 
-  fillMode  <- UI.button #+ [string "Fill"]
-  emptyMode <- UI.button #+ [string "Hollow"]
-  clear     <- UI.button #+ [string "Clear"]
+  beginnerMode  <- UI.button #+ [string "Flag Empty"]
+  intermediateMode <- UI.button #+ [string "Flag Clear"]
+  clear     <- UI.button #+ [string "Reset"]
 
   getBody window #+
     [column [element canvas]
-    , element fillMode, element emptyMode, element clear]
+    , element beginnerMode, element intermediateMode, element expertMode, element clear]
 
 
   let -- type declarations in let clauses are allowed by the ScopedTypeVariables extension
       efs :: Event (Modes -> Modes)
-      efs = const Fill <$ UI.click fillMode
+      efs = const Beginner <$ UI.click beginnerMode
 
       ehs :: Event (Modes -> Modes)
-      ehs = const NoFill <$ UI.click emptyMode
+      ehs = const Intermediate <$ UI.click intermediateMode
 
       modeEvent :: Event (Modes -> Modes)
       modeEvent = unionWith const efs ehs
 
-  drawingMode <- accumB Fill modeEvent
+  drawingMode <- accumB Beginner modeEvent
   mousePos <- stepper (0,0) $ UI.mousemove canvas
   let bst :: Behavior (Modes, (Double,Double))
       bst = (,) <$> drawingMode <*> mousePos
@@ -55,12 +55,11 @@ setup window = do
     canvas # UI.clearCanvas
 
 drawShape :: (Modes, (Double,Double)) -> Element -> UI ()
-drawShape (Fill, (x,y)) canvas = do
-  canvas # set' UI.fillStyle   (UI.htmlColor "black")
-  canvas # UI.fillRect (x,y) 100 100
-drawShape (NoFill, (x,y)) canvas = do
-  canvas # set' UI.fillStyle   (UI.htmlColor "white")
-  canvas # UI.fillRect (x,y) 100 100
-
+drawShape (Beginner, (x,y)) canvas = do
+  canvas # set' UI.fillStyle   (UI.htmlColor "red")
+  canvas # UI.fillRect (x,y) 75 75
+drawShape (Intermediate, (x,y)) canvas = do
+  canvas # set' UI.fillStyle   (UI.htmlColor "pink")
+  canvas # UI.fillRect (x,y) 75 75
 
 

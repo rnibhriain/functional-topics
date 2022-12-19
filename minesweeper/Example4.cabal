@@ -20,4 +20,4 @@ executable Example4
   build-depends:       base >= 4.7 && < 5
                      , mtl
                      , containers
-                     , threepenny-gui, network
+                     , threepenny-gui, network, random, split
