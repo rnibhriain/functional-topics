@@ -19,14 +19,18 @@ module Game where
                 command <- getLine
                 let move = convertCommand command
                 if isGameFinished move board
-                    then
+                    then do
                         endGame board
+                        putStrLn "You Lose\n"
                     else game (makeMove move board)
 
     makeMove :: Command -> Board -> Board
     makeMove (Command 'f' pos) board    | checkForMine board (Command 'f' pos) = flag board pos FlagBomb
                                         | otherwise = flag board pos FlagEmpty
-    makeMove (Command 'r' pos) board = placeNeighbours board pos
+    makeMove (Command 'r' pos) board = do 
+                                    let currentBoard = placeNeighbours board pos
+                                    clearNeighbours currentBoard pos
+                                    --recursiveClearNeighbours currentBoard (findNeighbours pos)
     makeMove _ board = board
 
     isGameFinished :: Command -> Board -> Bool
@@ -42,7 +46,7 @@ module Game where
             y = digitToInt (pos !! 2)
 
     endGame:: Board -> IO()
-    endGame (Board (x, _) grid _) = mapM_ putStrLn (splitEvery x (map printingReplacements grid))
+    endGame (Board (x, _) grid _) = mapM_ putStrLn (splitEvery x (map printingLostGame grid))
 
     checkForMine :: Board -> Command -> Bool
     checkForMine (Board _ cells _ ) (Command _ (x, y))  | cells !! ((x*10)+y) == Bomb ||  cells !! ((x*10)+y) == FlagBomb = True
@@ -54,7 +58,7 @@ module Game where
 
     printingReplacements:: Cell -> Char
     printingReplacements Empty = '-'
-    printingReplacements Bomb = 'x'
+    printingReplacements Bomb = '-'
     printingReplacements FlagBomb = 'f'
     printingReplacements FlagEmpty = 'e'
     printingReplacements (Neighbours 0) = ' '

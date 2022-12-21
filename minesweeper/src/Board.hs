@@ -34,7 +34,7 @@ module Board where
 
     -- places all the bombs
     placeBombs :: [Cell] -> [Int] -> [Cell]
-    placeBombs cells (x:[]) = 
+    placeBombs cells [x] = 
                     let (head, _:tail) = splitAt x cells in
                             head ++ [Bomb] ++ tail
     placeBombs cells (x:xs) = 
@@ -48,6 +48,14 @@ module Board where
             neighbours = [((i - 1), (j - 1)), ((i - 1), (j)), ((i - 1), (j + 1)),
                             ((i), (j - 1)), ((i), (j + 1)),
                             ((i + 1), (j - 1)), ((i + 1), (j)), ((i + 1), (j + 1))]
+
+    clearNeighbours :: Board -> (Int, Int) -> Board
+    clearNeighbours (Board size cells bombs) (x,y)  | findNumBombs (Board size cells bombs) (x,y) == 0 = checkEachNeighbour (Board size cells bombs) (findNeighbours (x,y))
+                                                    | otherwise = (Board size cells bombs)
+
+    checkEachNeighbour :: Board -> [Int] -> Board
+    checkEachNeighbour (Board size cells bombs) [x] = placeNeighbours (Board size cells bombs) (linearToTuple x (10,10) )
+    checkEachNeighbour (Board size cells bombs) (x:xs) = checkEachNeighbour (placeNeighbours (Board size cells bombs) (linearToTuple x (10,10) ) ) xs
 
     placeNeighbours :: Board -> (Int, Int) -> Board
     placeNeighbours (Board size cells bombs) (x,y) = 
@@ -75,8 +83,6 @@ module Board where
     findBombs (Board size cells bombs) (x:xs) input | cells !! x == Bomb || cells !! x == FlagBomb = findBombs (Board size cells bombs) xs (input + 1)
                                            | otherwise = findBombs (Board size cells bombs) xs input
     findBombs _ _ _  = 0
-
-
 
     -- initialises the bomb location list
     initialiseBombs :: Int -> Int -> [Int] -> [Int]
