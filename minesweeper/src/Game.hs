@@ -27,10 +27,12 @@ module Game where
     makeMove :: Command -> Board -> Board
     makeMove (Command 'f' pos) board    | checkForMine board (Command 'f' pos) = flag board pos FlagBomb
                                         | otherwise = flag board pos FlagEmpty
-    makeMove (Command 'r' pos) board = do 
-                                    let currentBoard = placeNeighbours board pos
-                                    clearNeighbours currentBoard pos
-                                    --recursiveClearNeighbours currentBoard (findNeighbours pos)
+    makeMove (Command 'r' pos) board = do  
+                                        let currentBoard = placeNeighbours board pos
+                                        clearNeighbours currentBoard pos
+                                        --openMine board pos
+                                    --let currentBoard = placeNeighbours board pos
+                                    --clearNeighbours currentBoard pos
     makeMove _ board = board
 
     isGameFinished :: Command -> Board -> Bool
@@ -61,7 +63,6 @@ module Game where
     printingReplacements Bomb = '-'
     printingReplacements FlagBomb = 'f'
     printingReplacements FlagEmpty = 'e'
-    printingReplacements (Neighbours 0) = ' '
     printingReplacements (Neighbours num) = intToDigit num
 
     printingLostGame:: Cell -> Char

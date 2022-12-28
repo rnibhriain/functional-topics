@@ -14,6 +14,8 @@ module Board where
                 | Neighbours Int
                 deriving (Eq, Show)
 
+    data Mode = MARKING | OPENING
+
     -- representation of the board (width, height) bombs currentBoard
     data Board = Board (Int, Int) [Cell] [Int]
 
@@ -49,10 +51,31 @@ module Board where
                             ((i), (j - 1)), ((i), (j + 1)),
                             ((i + 1), (j - 1)), ((i + 1), (j)), ((i + 1), (j + 1))]
 
+    openMine :: Board -> (Int, Int) -> Board
+    openMine (Board size cells bombs) (x,y) = do
+                        if isNeighbour (cells !! ((x*10)+y)) then (Board size cells bombs)
+                        else do
+                            let (head, _:tail) = splitAt ((x*10)+y) cells
+                            let currentBoard = Board size (head ++ [Neighbours (findNumBombs (Board size cells bombs) (x,y))] ++ tail) bombs
+                            if findNumBombs (Board size cells bombs) (x,y)  == 0 then openNeighbours (Board size cells bombs) (findNeighbours (x,y))
+                            else currentBoard
+
+    isNeighbour ::  Cell -> Bool
+    isNeighbour (Neighbours _) = True
+    isNeighbour _ = False
+            
+    openNeighbours :: Board -> [Int]-> Board
+    openNeighbours (Board size cells bombs) [x] = if isNeighbour (cells !! x) then (Board size cells bombs) 
+                                                  else openMine (Board size cells bombs) (linearToTuple x size)
+    openNeighbours (Board size cells bombs) (x:xs) = if isNeighbour (cells !! x) then openNeighbours (Board size cells bombs) xs
+                                                    else openNeighbours (openMine (Board size cells bombs) (linearToTuple x size)) xs
+
+
     clearNeighbours :: Board -> (Int, Int) -> Board
     clearNeighbours (Board size cells bombs) (x,y)  | findNumBombs (Board size cells bombs) (x,y) == 0 = checkEachNeighbour (Board size cells bombs) (findNeighbours (x,y))
                                                     | otherwise = (Board size cells bombs)
-
+                                                
+    
     checkEachNeighbour :: Board -> [Int] -> Board
     checkEachNeighbour (Board size cells bombs) [x] = placeNeighbours (Board size cells bombs) (linearToTuple x (10,10) )
     checkEachNeighbour (Board size cells bombs) (x:xs) = checkEachNeighbour (placeNeighbours (Board size cells bombs) (linearToTuple x (10,10) ) ) xs
