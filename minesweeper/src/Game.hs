@@ -35,6 +35,9 @@ module Game where
                                     --clearNeighbours currentBoard pos
     makeMove _ board = board
 
+    explodedBomb :: Board -> Board
+    explodedBomb (Board size cells mines _) = Board size cells mines True
+
     isGameFinished :: Command -> Board -> Bool
     isGameFinished (Command 'r' pos) board = checkForMine board (Command 'r' pos) 
     isGameFinished (Command _ _) _ = False
@@ -48,15 +51,15 @@ module Game where
             y = digitToInt (pos !! 2)
 
     endGame:: Board -> IO()
-    endGame (Board (x, _) grid _) = mapM_ putStrLn (splitEvery x (map printingLostGame grid))
+    endGame (Board (x, _) grid _ _) = mapM_ putStrLn (splitEvery x (map printingLostGame grid))
 
     checkForMine :: Board -> Command -> Bool
-    checkForMine (Board _ cells _ ) (Command _ (x, y))  | cells !! ((x*10)+y) == Bomb ||  cells !! ((x*10)+y) == FlagBomb = True
+    checkForMine (Board _ cells _ _) (Command _ (x, y))  | cells !! ((x*10)+y) == Bomb ||  cells !! ((x*10)+y) == FlagBomb = True
                                             | otherwise = False
 
     -- prints the board
     printBoard :: Board -> IO()
-    printBoard (Board (x, _) grid _) = mapM_ putStrLn (splitEvery x (map printingReplacements grid))
+    printBoard (Board (x, _) grid _ _) = mapM_ putStrLn (splitEvery x (map printingReplacements grid))
 
     printingReplacements:: Cell -> Char
     printingReplacements Empty = '-'

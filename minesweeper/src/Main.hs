@@ -1,9 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-
 module Main where
-
-
 
     import qualified Graphics.UI.Threepenny as UI
     import Graphics.UI.Threepenny.Core
@@ -29,11 +26,8 @@ module Main where
 
     canvasSize = 1000
 
-    siz :: Double
-    siz = 10.0
-
     size :: Int
-    size = 10.0
+    size = 10
 
     setup :: Board -> Window -> UI ()
     setup game window = do
@@ -59,7 +53,7 @@ module Main where
                 element clear
                 ]
 
-        currentGame     <- liftIO $ newIORef (game)
+        currentGame     <- liftIO $ newIORef game
         currentMode     <- liftIO $ newIORef OPENING
         currentCount    <- liftIO $ newIORef 1
 
@@ -91,82 +85,99 @@ module Main where
             case mode of
                 OPENING -> do
                     current     <- liftIO $ readIORef currentGame
-                    let move = Command 'e'  ( roundDoubleInt (y `div` (canvasSize `div` size)) , roundDoubleInt (x `div` (canvasSize `div` size)) )
-                    let latestGame = makeMove current move 
-                    liftIO $ writeIORef currentGame latestGame
-                    do
-                        drawBoard latestGame canvas
+                    let move = Command 'e'  (  roundDoubleInt y `div` (canvasSize `div` size) , roundDoubleInt x `div` (canvasSize `div` size) )
+                    if isGameFinished move current
+                    then do
+                        let latestGame = explodedBomb current
+                        liftIO $ writeIORef currentGame latestGame
+                        do
+                            drawBoard latestGame canvas
+                    else do
+                        let latestGame = makeMove move current
+                        liftIO $ writeIORef currentGame latestGame
+                        do
+                            drawBoard latestGame canvas
                 MARKING -> do
                     current     <- liftIO $ readIORef currentGame
-                    let move = Command 'f'  ( roundDoubleInt (y `div` (canvasSize `div` size)) , roundDoubleInt (x `div` (canvasSize `div` size)) )
-                    let latestGame = makeMove current move
+                    let move = Command 'f'  (  roundDoubleInt y `div` (canvasSize `div` size) , roundDoubleInt x `div` (canvasSize `div` size) )
+                    let latestGame = makeMove move current
                     liftIO $ writeIORef currentGame latestGame
                     do
                         drawBoard latestGame canvas
 
     drawBoard :: Board -> Element -> UI ()
-    drawBoard (Board (x, y) grid bombs) canvas = do
-        if isGameFinished (Board (x, y) grid bombs) then do
+    drawBoard (Board (x, y) grid bombs status) canvas = do
+        if status then do
             canvas # set' UI.fillStyle (UI.htmlColor "black")
             canvas # UI.fillRect (200, 275) 400 200
             canvas # set' UI.fillStyle (UI.htmlColor "white")
-            canvas # set' UI.textAlign (UI.Center)
+            canvas # set' UI.textAlign UI.Center
             canvas # set' UI.textFont "52px sans-serif"
             canvas # UI.fillText "LOSE" (400, 400)
-        else if checkWin (Board (x, y) grid bombs) then do
+        else if checkWin (Board (x, y) grid bombs status) then do
             canvas # set' UI.fillStyle (UI.htmlColor "black")
             canvas # UI.fillRect (200, 275) 400 200
             canvas # set' UI.fillStyle (UI.htmlColor "white")
-            canvas # set' UI.textAlign (UI.Center)
+            canvas # set' UI.textAlign UI.Center
             canvas # set' UI.textFont "52px sans-serif"
             canvas # UI.fillText "WIN" (400, 400)
-        else mapM_ drawBoardSquare (splitEvery x (map printingReplacements grid)) canvas
-        return () 
+        else drawGrid grid 0 canvas
+        --where drawRow row = V.forM row (\square -> drawBoardSquare square canvas)
+
+        --drawBoardSquare '-' (0,0) canvas  
+        --else mapM_ drawBoardSquare (splitEvery x (map printingReplacements grid)) (0, 0) canvas
+        
     --V.forM mapM_ putStrLn (splitEvery x (map printingReplacements grid))
     --row (\square -> drawBoardSquare (printingReplacements square) canvas)
+
+    drawGrid :: [Cell] -> Int -> Element -> UI ()
+    drawGrid [x] num canvas = drawBoardSquare (printingReplacements x) (linearToTuple num (10, 10)) canvas
+    drawGrid (x:xs) num canvas = do 
+                                    drawBoardSquare (printingReplacements x) (linearToTuple num (10, 10)) canvas
+                                    drawGrid xs (num+1) canvas
 
     drawBoardSquare :: Char -> (Int, Int) -> Element -> UI ()
     drawBoardSquare 'x' (i, j) canvas = do
         canvas # set' UI.fillStyle (UI.htmlColor "red")
         canvas # UI.fillRect
-            ( fromIntegral ((j * (canvasSize `div` size) + 3))
-            , fromIntegral ((i * (canvasSize `div` size) + 3))
+            ( fromIntegral (j * (canvasSize `div` size) + 3)
+            , fromIntegral (i * (canvasSize `div` size) + 3)
             )
             (fromIntegral (canvasSize `div` size - 6))
             (fromIntegral (canvasSize `div` size - 6))
     drawBoardSquare '-' (i, j) canvas = do
         canvas # set' UI.fillStyle (UI.htmlColor "gray")
         canvas # UI.fillRect
-            ( fromIntegral ((j * (canvasSize `div` size) + 3))
-            , fromIntegral ((i * (canvasSize `div` size) + 3))
+            ( fromIntegral (j * (canvasSize `div` size) + 3)
+            , fromIntegral (i * (canvasSize `div` size) + 3)
             )
             (fromIntegral (canvasSize `div` size - 6))
             (fromIntegral (canvasSize `div` size - 6))
     drawBoardSquare 'f' (i, j) canvas = do
         canvas # set' UI.fillStyle (UI.htmlColor "blue")
         canvas # UI.fillRect
-            ( fromIntegral ((j * (canvasSize `div` size) + 3))
-            , fromIntegral ((i * (canvasSize `div` size) + 3))
+            ( fromIntegral (j * (canvasSize `div` size) + 3)
+            , fromIntegral (i * (canvasSize `div` size) + 3)
             )
             (fromIntegral (canvasSize `div` size - 6))
             (fromIntegral (canvasSize `div` size - 6))
     drawBoardSquare 'e' (i, j) canvas = do
         canvas # set' UI.fillStyle (UI.htmlColor "green")
         canvas # UI.fillRect
-            ( fromIntegral ((j * (canvasSize `div` size) + 3))
-            , fromIntegral ((i * (canvasSize `div` size) + 3))
+            ( fromIntegral (j * (canvasSize `div` size) + 3)
+            , fromIntegral (i * (canvasSize `div` size) + 3)
             )
             (fromIntegral (canvasSize `div` size - 6))
             (fromIntegral (canvasSize `div` size - 6))
     drawBoardSquare ch (i, j) canvas = do
         canvas # set' UI.fillStyle (UI.htmlColor "white")
         canvas # UI.fillRect
-            ( fromIntegral ((j * (canvasSize `div` size) + 3))
-            , fromIntegral ((i * (canvasSize `div` size) + 3))
+            ( fromIntegral (j * (canvasSize `div` size) + 3)
+            , fromIntegral (i * (canvasSize `div` size) + 3)
             )
             (fromIntegral (canvasSize `div` size - 6))
             (fromIntegral (canvasSize `div` size - 6))
-        canvas # set' UI.textAlign (UI.Center)
+        canvas # set' UI.textAlign UI.Center
         canvas # set' UI.textFont "24px sans-serif"
         canvas # UI.fillText
             (show ch)
