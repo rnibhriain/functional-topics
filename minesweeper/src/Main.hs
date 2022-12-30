@@ -85,7 +85,7 @@ module Main where
             case mode of
                 OPENING -> do
                     current     <- liftIO $ readIORef currentGame
-                    let move = Command 'e'  (  roundDoubleInt y `div` (canvasSize `div` size) , roundDoubleInt x `div` (canvasSize `div` size) )
+                    let move = Command 'r'  (  roundDoubleInt y `div` (canvasSize `div` size) , roundDoubleInt x `div` (canvasSize `div` size) )
                     if isGameFinished move current
                     then do
                         let latestGame = explodedBomb current
@@ -169,6 +169,14 @@ module Main where
             )
             (fromIntegral (canvasSize `div` size - 6))
             (fromIntegral (canvasSize `div` size - 6))
+    drawBoardSquare '0' (i, j) canvas = do
+        canvas # set' UI.fillStyle (UI.htmlColor "white")
+        canvas # UI.fillRect
+            ( fromIntegral (j * (canvasSize `div` size) + 3)
+            , fromIntegral (i * (canvasSize `div` size) + 3)
+            )
+            (fromIntegral (canvasSize `div` size - 6))
+            (fromIntegral (canvasSize `div` size - 6))
     drawBoardSquare ch (i, j) canvas = do
         canvas # set' UI.fillStyle (UI.htmlColor "white")
         canvas # UI.fillRect
@@ -179,6 +187,7 @@ module Main where
             (fromIntegral (canvasSize `div` size - 6))
         canvas # set' UI.textAlign UI.Center
         canvas # set' UI.textFont "24px sans-serif"
+        canvas # set' UI.fillStyle (UI.htmlColor "black")
         canvas # UI.fillText
             (show ch)
             ( fromIntegral
