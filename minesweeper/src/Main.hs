@@ -10,27 +10,24 @@ module Main where
     import           Data.IORef
     import Data.List.Split
     import GHC.Float.RealFracMethods (roundDoubleInt)
+    import System.Random
     
     main :: IO ()
     main = do
-        let board = initialiseBoard (10, 10) 10  -- this is the basic difficulty level in Minesweeper
-        startGUI defaultConfig (setup board)
+        gen <- newStdGen
+        let randomNumbers = randomRs (0, 19) gen :: [Int]
+        let board = initialiseBoard (10, 10) 10 7  -- this is the basic difficulty level in Minesweeper
+        startGUI defaultConfig (setup board randomNumbers)
 
-
-   -- main:: IO()
-    --main = do
-    --    putStrLn "Enter a command:\n[action] [row no.] [col no.]\nwhere actions are:\n'c' for clear\n'f' for flag "
-        
-        --game (initialiseBoard (10, 10) 10)  -- this is the basic difficulty level in 
-    
+    data Mode = MARKING | OPENING
 
     canvasSize = 1000
 
     size :: Int
     size = 10
 
-    setup :: Board -> Window -> UI ()
-    setup game window = do
+    setup :: Board -> [Int] -> Window -> UI ()
+    setup game randNums window = do
 
         return window # set title "Minesweeper Game"
 
@@ -55,7 +52,7 @@ module Main where
 
         currentGame     <- liftIO $ newIORef game
         currentMode     <- liftIO $ newIORef OPENING
-        currentCount    <- liftIO $ newIORef 1
+        currentCount    <- liftIO $ newIORef 0
 
         on UI.click revealmode $ \_ -> do
             liftIO $ writeIORef currentMode OPENING
@@ -74,8 +71,9 @@ module Main where
             canvas # UI.clearCanvas
             current <- liftIO $ readIORef currentGame
             count <- liftIO $ readIORef currentCount
-            let latestGame = initialiseBoard (10, 10) 10
-            liftIO $ writeIORef currentGame latestGame
+            let ranNum = randNums !! count
+            let latestGame = initialiseBoard (10, 10) 10 ranNum
+            liftIO $ writeIORef currentGame latestGame  
             liftIO $ writeIORef currentCount (count+1)
             do
                 drawBoard latestGame canvas
@@ -122,18 +120,18 @@ module Main where
             canvas # set' UI.textFont "52px sans-serif"
             canvas # UI.fillText "WIN" (400, 400)
         else drawGrid grid 0 canvas
-        --where drawRow row = V.forM row (\square -> drawBoardSquare square canvas)
 
-        --drawBoardSquare '-' (0,0) canvas  
-        --else mapM_ drawBoardSquare (splitEvery x (map printingReplacements grid)) (0, 0) canvas
-        
-    --V.forM mapM_ putStrLn (splitEvery x (map printingReplacements grid))
-    --row (\square -> drawBoardSquare (printingReplacements square) canvas)
+    drawGridEnd :: [Cell] -> Int -> Element -> UI ()
+    drawGridEnd [x] num canvas = drawBoardSquare (printingLostGame x) (linearToTuple num (10, 10)) canvas
+    drawGridEnd (x:xs) num canvas = do 
+                                    drawBoardSquare (printingLostGame x) (linearToTuple num (10, 10)) canvas
+                                    drawGrid xs (num+1) canvas
+
 
     drawGrid :: [Cell] -> Int -> Element -> UI ()
-    drawGrid [x] num canvas = drawBoardSquare (printingReplacements x) (linearToTuple num (10, 10)) canvas
+    drawGrid [x] num canvas = drawBoardSquare (convertCells x) (linearToTuple num (10, 10)) canvas
     drawGrid (x:xs) num canvas = do 
-                                    drawBoardSquare (printingReplacements x) (linearToTuple num (10, 10)) canvas
+                                    drawBoardSquare (convertCells x) (linearToTuple num (10, 10)) canvas
                                     drawGrid xs (num+1) canvas
 
     drawBoardSquare :: Char -> (Int, Int) -> Element -> UI ()

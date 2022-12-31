@@ -7,67 +7,63 @@ module Game where
     -- either 'f' or 'e' and a position
     data Command = Command Char (Int, Int)
 
-    game :: Board -> IO()
-    game board = do
-        printBoard board
-        putStrLn "\nNext Move"
-        if checkWin board
-            then
-                putStrLn "Win!!\n"
-            else do
-                putStrLn "Enter your next Move\n"
-                command <- getLine
-                let move = convertCommand command
-                if isGameFinished move board
-                    then do
-                        endGame board
-                        putStrLn "You Lose\n"
-                    else game (makeMove move board)
-
+    -- makes the move the user wanted
+        -- input:
+        -- move - flag or reveal and a position
+        -- current board
+        -- ouptput: 
+        -- board after move is made
     makeMove :: Command -> Board -> Board
     makeMove (Command 'f' pos) board    | checkForMine board (Command 'f' pos) = flag board pos FlagBomb
                                         | otherwise = flag board pos FlagEmpty
-    makeMove (Command 'r' pos) board = do  
-                                        let currentBoard = placeNeighbours board pos
-                                        clearNeighbours currentBoard pos
-                                        --openMine board pos
-                                    --let currentBoard = placeNeighbours board pos
-                                    --clearNeighbours currentBoard pos
+    makeMove (Command 'r' pos) board = openMine board pos
     makeMove _ board = board
 
+    -- changes status of board to true for lost game
+        -- input:
+        -- board
+        -- ouptut: 
+        -- board with changed status
     explodedBomb :: Board -> Board
     explodedBomb (Board size cells mines _) = Board size cells mines True
 
+    -- checks if the current move will explode a bomb
+        -- input: 
+        -- current move
+        -- current board
+        -- output: 
+        -- true for bomb will explode false for no bomb at that location
     isGameFinished :: Command -> Board -> Bool
     isGameFinished (Command 'r' pos) board = checkForMine board (Command 'r' pos) 
     isGameFinished (Command _ _) _ = False
 
-    convertCommand :: String -> Command
-    convertCommand cmd = Command move (x, y)
-        where 
-            move = head cmd
-            pos = drop 2 cmd
-            x = digitToInt (pos !! 0)
-            y = digitToInt (pos !! 2)
-
-    endGame:: Board -> IO()
-    endGame (Board (x, _) grid _ _) = mapM_ putStrLn (splitEvery x (map printingLostGame grid))
-
+    -- checks if there is a mine at the location of the position in the command
+        -- input:
+        -- current board
+        -- current command
+        -- output: 
+        -- True if there is a bomb false if not
     checkForMine :: Board -> Command -> Bool
     checkForMine (Board _ cells _ _) (Command _ (x, y))  | cells !! ((x*10)+y) == Bomb ||  cells !! ((x*10)+y) == FlagBomb = True
                                             | otherwise = False
 
-    -- prints the board
-    printBoard :: Board -> IO()
-    printBoard (Board (x, _) grid _ _) = mapM_ putStrLn (splitEvery x (map printingReplacements grid))
+    -- converts each cell to a character for printing the game
+        -- input: 
+        -- cell
+        -- output: 
+        -- character equivalent
+    convertCells:: Cell -> Char
+    convertCells Empty = '-'
+    convertCells Bomb = '-'
+    convertCells FlagBomb = 'f'
+    convertCells FlagEmpty = 'e'
+    convertCells (Neighbours num) = intToDigit num
 
-    printingReplacements:: Cell -> Char
-    printingReplacements Empty = '-'
-    printingReplacements Bomb = '-'
-    printingReplacements FlagBomb = 'f'
-    printingReplacements FlagEmpty = 'e'
-    printingReplacements (Neighbours num) = intToDigit num
-
+     -- converts each cell to a character for printing the game
+        -- input: 
+        -- cell
+        -- output: 
+        -- character equivalent
     printingLostGame:: Cell -> Char
     printingLostGame Bomb = 'x'
     printingLostGame _ = '-'
