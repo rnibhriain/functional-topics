@@ -16,7 +16,7 @@ module Main where
     main = do
         gen <- newStdGen
         let randomNumbers = randomRs (0, 19) gen :: [Int]
-        let board = initialiseBoard (10, 10) 10 7  -- this is the basic difficulty level in Minesweeper
+        let board = initialiseBoard (10, 10) 10 7  -- Basic difficulty level
         startGUI defaultConfig (setup board randomNumbers)
 
     data Mode = MARKING | OPENING
@@ -67,6 +67,7 @@ module Main where
         --    do
         --        drawBoard latestGame canvas
 
+        -- restarts the game with the bombs in different positions
         on UI.click clear $ \_ -> do
             canvas # UI.clearCanvas
             current <- liftIO $ readIORef currentGame
@@ -78,6 +79,7 @@ module Main where
             do
                 drawBoard latestGame canvas
 
+        -- either reveals or marks a cell
         on UI.mousedown canvas $ \(x, y) -> do
             mode <- liftIO $ readIORef currentMode
             case mode of
@@ -103,6 +105,7 @@ module Main where
                     do
                         drawBoard latestGame canvas
 
+    -- darws all the cells on the canvas and a win or lose sign if the game is over
     drawBoard :: Board -> Element -> UI ()
     drawBoard (Board (x, y) grid bombs status) canvas = do
         if status then do
@@ -121,19 +124,21 @@ module Main where
             canvas # UI.fillText "WIN" (400, 400)
         else drawGrid grid 0 canvas
 
+    -- draws the board when the user has lost
     drawGridEnd :: [Cell] -> Int -> Element -> UI ()
     drawGridEnd [x] num canvas = drawBoardSquare (printingLostGame x) (linearToTuple num (10, 10)) canvas
     drawGridEnd (x:xs) num canvas = do 
                                     drawBoardSquare (printingLostGame x) (linearToTuple num (10, 10)) canvas
                                     drawGrid xs (num+1) canvas
 
-
+    -- draws the current board
     drawGrid :: [Cell] -> Int -> Element -> UI ()
     drawGrid [x] num canvas = drawBoardSquare (convertCells x) (linearToTuple num (10, 10)) canvas
     drawGrid (x:xs) num canvas = do 
                                     drawBoardSquare (convertCells x) (linearToTuple num (10, 10)) canvas
                                     drawGrid xs (num+1) canvas
 
+    -- draws a single cell depending on its content
     drawBoardSquare :: Char -> (Int, Int) -> Element -> UI ()
     drawBoardSquare 'x' (i, j) canvas = do
         canvas # set' UI.fillStyle (UI.htmlColor "red")
