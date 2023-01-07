@@ -7,6 +7,7 @@ module Main where
     import Reactive.Threepenny
     import Board
     import Game
+    import Player
     import           Data.IORef
     import Data.List.Split
     import GHC.Float.RealFracMethods (roundDoubleInt)
@@ -60,12 +61,11 @@ module Main where
         on UI.click flagmode $ \_ -> do
             liftIO $ writeIORef currentMode MARKING
 
-       -- on UI.click playmode $ \_ -> do
-        --    current <- liftIO $ readIORef currentGame
-        --    let latestGame = makeMove current
-        --    liftIO $ writeIORef currentGame latestGame
-        --    do
-        --        drawBoard latestGame canvas
+        on UI.click playmode $ \_ -> do
+            current <- liftIO $ readIORef currentGame
+            let latestGame = makeSafeMove current
+            liftIO $ writeIORef currentGame latestGame
+            drawBoard latestGame canvas
 
         -- restarts the game with the bombs in different positions
         on UI.click clear $ \_ -> do
