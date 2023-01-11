@@ -109,16 +109,16 @@ module Main where
     drawBoard :: Board -> Element -> UI ()
     drawBoard (Board (x, y) grid bombs status) canvas = do
         if status then do
+            canvas # set' UI.fillStyle (UI.htmlColor "red")
+            canvas # UI.fillRect (225, 300) 400 200
             canvas # set' UI.fillStyle (UI.htmlColor "black")
-            canvas # UI.fillRect (200, 275) 400 200
-            canvas # set' UI.fillStyle (UI.htmlColor "white")
             canvas # set' UI.textAlign UI.Center
             canvas # set' UI.textFont "52px sans-serif"
             canvas # UI.fillText "LOSE" (400, 400)
         else if checkWin (Board (x, y) grid bombs status) then do
+            canvas # set' UI.fillStyle (UI.htmlColor "green")
+            canvas # UI.fillRect (225, 300) 400 200
             canvas # set' UI.fillStyle (UI.htmlColor "black")
-            canvas # UI.fillRect (200, 275) 400 200
-            canvas # set' UI.fillStyle (UI.htmlColor "white")
             canvas # set' UI.textAlign UI.Center
             canvas # set' UI.textFont "52px sans-serif"
             canvas # UI.fillText "WIN" (400, 400)

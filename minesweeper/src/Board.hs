@@ -9,6 +9,8 @@ module Board where
     -- All the possible cells
     data Cell = Bomb
                 | Empty
+                | Unknown   -- secrets from player
+                | Flag      -- secrets from player
                 | FlagBomb
                 | FlagEmpty 
                 | Neighbours Int 
@@ -65,11 +67,11 @@ module Board where
         -- list of current valid neighbours
         -- output:
         -- list all all valid neighbours to check 
-    findNeighbs :: Board -> [Int] -> [Int] -> [Int]
-    findNeighbs (Board size cells bombs status) [x] y = if isNeighbour (cells !! x) then y
+    findNeighbs :: [Cell] -> [Int] -> [Int] -> [Int]
+    findNeighbs cells [x] y = if isNeighbour (cells !! x) then y
                                                         else y++[x]
-    findNeighbs (Board size cells bombs status) (x:xs) y = if isNeighbour (cells !! x) then findNeighbs (Board size cells bombs status) xs y
-                                                         else findNeighbs (Board size cells bombs status) xs y++[x]
+    findNeighbs cells (x:xs) y = if isNeighbour (cells !! x) then findNeighbs cells xs y
+                                                         else findNeighbs cells xs y++[x]
     findNeighbs _ _ y = y
 
     -- returnsLinear coords of neighbours to given tuple coord
