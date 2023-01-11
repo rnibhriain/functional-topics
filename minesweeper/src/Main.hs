@@ -114,14 +114,14 @@ module Main where
             canvas # set' UI.fillStyle (UI.htmlColor "black")
             canvas # set' UI.textAlign UI.Center
             canvas # set' UI.textFont "52px sans-serif"
-            canvas # UI.fillText "LOSE" (500, 500)
+            canvas # UI.fillText "YOU LOSE!" (500, 500)
         else if checkWin (Board (x, y) grid bombs status) then do
             canvas # set' UI.fillStyle (UI.htmlColor "green")
             canvas # UI.fillRect (300, 400) 400 200
             canvas # set' UI.fillStyle (UI.htmlColor "black")
             canvas # set' UI.textAlign UI.Center
             canvas # set' UI.textFont "52px sans-serif"
-            canvas # UI.fillText "WIN" (500, 500)
+            canvas # UI.fillText "YOU WIN!" (500, 500)
         else drawGrid grid 0 canvas
 
     -- draws the board when the user has lost
