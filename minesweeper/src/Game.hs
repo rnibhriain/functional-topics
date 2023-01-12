@@ -58,6 +58,7 @@ module Game where
     convertCells FlagBomb = 'f'
     convertCells FlagEmpty = 'f'
     convertCells (Neighbours num) = intToDigit num
+    convertCells _ = '-'
     
 
      -- converts each cell to a character for printing the game
