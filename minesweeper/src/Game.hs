@@ -56,7 +56,7 @@ module Game where
     convertCells Empty = '-'
     convertCells Bomb = '-'
     convertCells FlagBomb = 'f'
-    convertCells FlagEmpty = 'e'
+    convertCells FlagEmpty = 'f'
     convertCells (Neighbours num) = intToDigit num
     
 
