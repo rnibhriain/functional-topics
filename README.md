@@ -1,4 +1,4 @@
-# Functional Topics
+# Topics in Functional Programming
 
 ## All assignments for CSU44012
 
