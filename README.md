@@ -1,6 +1,6 @@
 # Topics in Functional Programming
 
-## All assignments for CSU44012
+## All assignments for module: CSU44012
 
 - Weekly exercises
 - Assignment 1 - scotty example
