@@ -1,5 +1,7 @@
 # Topics in Functional Programming
 
+2022 - 2023
+
 ## All assignments for module: CSU44012
 
 - Weekly exercises
